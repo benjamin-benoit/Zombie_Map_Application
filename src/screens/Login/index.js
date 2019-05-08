@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
 import {
     ScrollView,
-    Text,
-    TextInput,
     View,
-    Button,
-    Alert,
     ActivityIndicator
 } from 'react-native';
-import { Container, Header, Content, Form, Item, Input, Label } from 'native-base';
-import { Game } from "../../../App.js";
+import { Container, Button, Text, Content, Form, Input, Item } from 'native-base';
 import Environment from '../../../Environment';
 
 export default class Login extends Component {
@@ -97,7 +92,7 @@ export default class Login extends Component {
     }
 
     render() {
-        // const {navigate} = this.props.navigation;
+        const {navigate} = this.props.navigation;
         return (
             <Container>
               <Content>
@@ -107,16 +102,15 @@ export default class Login extends Component {
 					style={{fontSize: 27}}>
 					Login
 				</Text> */}
-
-            {/* <Item fixedLabel> */}
-              {/* <Label>Nickname</Label> */}
+              <Item inlineLabel>
               <Input 
 					ref={component => this._nickname = component}
 					placeholder='Nickname' 
 					onChangeText={(nickname) => this.setState({nickname})}
 					autoFocus={true}
 					onFocus={this.clearNickname}/>
-            {/* </Item> */}
+            </Item>
+            <Item inlineLabel>
 				<Input 
 					ref={component => this._password = component}
 					placeholder='Password' 
@@ -125,6 +119,7 @@ export default class Login extends Component {
 					onFocus={this.clearPassword}
 					onSubmitEditing={this._userLogin}
 				/>
+                </Item>
 				{!!this.state.message && (
 					<Text
 						style={{fontSize: 14, color: 'red', padding: 5}}>
@@ -133,11 +128,17 @@ export default class Login extends Component {
 				)}
 				{this.state.isLoggingIn && <ActivityIndicator />}
 				<View style={{margin:7}} />
-				<Button 
+				<Button block
 					disabled={this.state.isLoggingIn||!this.state.nickname||!this.state.password}
-                    onPress={this.login}
-		      		title="Se connecter"
-		      	/>
+                    onPress={this.login}>
+                    <Text>Se connecter</Text>
+                    </Button>
+          <Button bordered block style={{
+                marginTop: 10
+              }}
+              onPress={() => navigate('Register', {})}>
+            <Text>Pas encore inscrit ?</Text>
+          </Button>
 	      </ScrollView>
           </Form>
         </Content>

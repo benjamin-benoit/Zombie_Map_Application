@@ -78,7 +78,7 @@ const AppNavigator = createStackNavigator({
     screen: Game,
   }
 }, {
-  initialRouteName: 'Login',
+  initialRouteName: 'Game',
 });
 
 const AppContainer = createAppContainer(AppNavigator);

@@ -119,15 +119,15 @@ export default class Game extends Component {
     );
     if (distance < 150) {//TODO remettre disrance à 100
       Alert.alert(
-        "There is a Zombie !",
-        "Do you want to fight him ?",
+        'There is a Zombie !',
+        'Do you want to fight him ?',
         [
           {
-            text: "Run away",
+            text: 'Run away',
             style: 'cancel',
           },
           {
-            text: "Fight",
+            text: 'Fight',
             // onPress: () => this._killZombie(spawnId),
             onPress: () => this._BattleZombie(zombie)
           }
@@ -147,16 +147,29 @@ export default class Game extends Component {
   }
 
   _BattleZombie(zombie){
-    // console.log(typeof zombie.lifePoints)
-    // console.log(typeof zombie.attackPoints)
+    let bonus = (this.state.user.weapon.bonus) ? this.state.user.weapon.bonus : 0
+    let damage = parseInt(this.state.user.attackPoints)+parseInt(bonus)
     let current = Object.assign({}, this.state.user);
     console.log(current)
-    let zombieLP = this._userAttacks(current.attackPoints,zombie.lifePoints)
-    zombies[zombie.id-1].lifePoints = zombieLP
+    let zombieLP = this._userAttacks(damage,zombie.lifePoints)
+    for(var i=0; i<zombies.length; i++){
+      if(zombies[i].id == zombie.id){
+          zombies[i].lifePoints = zombieLP
+      }
+    }
     if(zombieLP<=0){
       alert('You killed the zombie !')
       //this._killZombie(zombie.id)
-      return 1;
+      for(var i=0; i<zombies.length; i++){
+        if(zombies[i].id == zombie.id){
+            zombies.splice(i, 1);  //removes 1 element at position i 
+            break;
+        }
+      }
+      for(var i=0; i<zombies.length; i++){
+        console.log(zombies[i])
+      }
+        return 1;
     }
     let playerLP = this._zombieAttacks(current.lifePoints,zombie.attackPoints)
     current.lifePoints = playerLP;
@@ -195,7 +208,7 @@ export default class Game extends Component {
   }
 
 
-  _onTake = async (markerData, gun) => {
+  _onTakeGun = async (markerData, gun) => {
     var spawnLatLong = markerData.coordinate;
     var distance = geolib.getDistance(
       spawnLatLong,
@@ -203,14 +216,15 @@ export default class Game extends Component {
     );
     if (distance < 150) {//TODO remettre disrance à 100
       Alert.alert(
-        "There is a gun !"
+        'There is a gun !',
+        'It looks powerful !',
         [
           {
-            text: "Leave it",
+            text: 'Leave it',
             style: 'cancel',
           },
           {
-            text: "Take it",
+            text: 'Take it',
             // onPress: () => this._killZombie(spawnId),
             onPress: () => this._AddBonus(gun)
           }
@@ -224,16 +238,24 @@ export default class Game extends Component {
 
   _AddBonus(gun){
     let current = Object.assign({}, this.state.user);
-    current.attackPoints =+ gun.bonus
+    current.weapon = gun
     this.setState({user:current})
     alert(`You took the ${gun.title}! Go shoot some zombies now.`)
+    for(var i=0; i<weapons.length; i++){
+      if(weapons[i].id == gun.id){
+          weapons.splice(i, 1);  //removes 1 element at position i 
+          break;
+      }
+    }
   }
 
   mapStyle = require("./mapStyle.json");
 
   render() {
     const { navigate } = this.props.navigation;
-    // this._getZombiesSpawns()
+    let bonus = (this.state.user.weapon.bonus) ? this.state.user.weapon.bonus : 0
+    let damage = parseInt(this.state.user.attackPoints)+parseInt(bonus)
+    //(this.state.user.weapon) ? this.setState({})
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden />
@@ -250,7 +272,7 @@ export default class Game extends Component {
           >Parameter</Text>
           <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10, textAlign: 'right' }}
           >
-            Score:{this.state.user.score} Life:{this.state.user.lifePoints} Atk:{this.state.user.attackPoints}
+            Score:{this.state.user.score}   Life:{this.state.user.lifePoints}   Atk:{damage}
           </Text>
         </View>
         <MapView
@@ -273,9 +295,8 @@ export default class Game extends Component {
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
               id={m.id}
               title={m.title}
-              description={`
-              HP: ${m.lifePoints}
-              ATK:${m.attackPoints}`}
+              description={`HP: ${m.lifePoints} 
+ATK:${m.attackPoints}`}
               lifePoints= {m.lifePoints}
               attackPoints = {m.attackPoints}
               key={`marker-${i}`}
@@ -284,18 +305,31 @@ export default class Game extends Component {
               onPress={(e) => { this._onSpawnPress(e.nativeEvent, m) }}
             />
           ))}
-          {/* {weapons.map((m, i) => ( 
+          {weapons.map((m, i) => ( 
             <MapView.Marker
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
               id={m.id}
               title={m.title}
               description={`Ammo: ${m.ammo}
-              Power: ${m.bonus}`}
+Power: ${m.bonus}`}
               bonus = {m.bonus}
               key={`marker-${i}`}
               pinColor="#20794C"
               image={require("../../../assets/gun-4.png")}
-              onPress={(e) => { this._onTake(e.nativeEvent, m) }}
+              onPress={(e) => { this._onTakeGun(e.nativeEvent, m) }}
+            />
+          ))}
+          {/* {packs.map((m, i) => ( 
+            <MapView.Marker
+              coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+              id={m.id}
+              title={m.title}
+              description={`Heal: ${m.heal}`}
+              heal = {m.heal}
+              key={`marker-${i}`}
+              pinColor="#20794C"
+              image={require("../../../assets/first-aid-kit.png")}
+              onPress={(e) => { this._onHeal(e.nativeEvent, m) }}
             />
           ))} */}
         </MapView>
@@ -346,5 +380,19 @@ const weapons = [
 ]
 
 const packs = [
-
+  {id: 1,
+    latitude: 48.759935, 
+    longitude: 2.401252,
+    title:'Tiny health pack',
+    description:'Health pack',
+    heal:3,
+  },
+  {
+    id: 2,
+    latitude: 48.758931,  
+    longitude: 2.401080,
+    title:'Big Health pack',
+    description:'Health pack',
+    heal : 5,
+  }
 ]

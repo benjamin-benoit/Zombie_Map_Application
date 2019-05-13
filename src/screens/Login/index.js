@@ -129,7 +129,7 @@ export default class Login extends Component {
                 }
                 onPress={this.login}
               >
-                <Text>Se connecter</Text>
+                <Text>Login</Text>
               </Button>
               <Button
                 bordered
@@ -139,7 +139,7 @@ export default class Login extends Component {
                 }}
                 onPress={() => navigate("Register", {})}
               >
-                <Text>Pas encore inscrit ?</Text>
+                <Text>Not registered yet ?</Text>
               </Button>
             </ScrollView>
           </Form>

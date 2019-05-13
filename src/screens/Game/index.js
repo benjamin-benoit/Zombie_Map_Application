@@ -136,7 +136,7 @@ export default class Game extends Component {
         { cancelable: true }
       );
     } else {
-      alert("Vous êtes trop loin");
+      alert("You're too far");
     }
   }
 

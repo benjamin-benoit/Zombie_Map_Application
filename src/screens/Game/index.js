@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, StatusBar, Alert } from "react-native";
+import { Text, View, StatusBar, Alert, Image } from "react-native";
 import { MapView, Location, Permissions } from "expo";
 import geolib from 'geolib';
 import Environment from "../../../Environment";
@@ -299,26 +299,12 @@ export default class Game extends Component {
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden />
-        <View style={{
-          flexDirection: 'row', height: 30,
-          backgroundColor: "#000"
-        }}>
-
-          <Text style={{
-            backgroundColor: "#fff", padding: 5, color: "#000", fontSize: 18
-          }}
-            //onPress={() => navigate("Parameter", { user: this.state.user })}
-            onPress={() => navigate("Parameter", {})}
-          >Parameter</Text>
-          <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10, textAlign: 'right' }}
-          >
-            Score:{this.state.user.score}   Life:{this.state.user.lifePoints}   Atk:{damage}
-          </Text>
-        </View>
         <MapView
           showsUserLocation
           followsUserLocation
-          style={{ flex: 1 }}
+          style={{
+            flex: 1
+          }}
           region={this.state.region}
           zoomEnabled={false}
           pitchEnabled={false}
@@ -373,6 +359,55 @@ Power: ${m.bonus}`}
             />
           ))}
         </MapView>
+
+        <View style={{
+          flexDirection: 'row',
+          justifyContent:'space-between', 
+          height: 30,
+          left:0,
+          right:0,
+          top:0,
+          position:'absolute'
+        }}>
+          <View style={{
+            flex: 1,
+            flexDirection: 'column'
+          }}> 
+              <View>
+                <Text style={{ padding: 10, color: "#fff", fontSize: 18, paddingLeft: 10}}
+                >
+                Score: {this.state.user.score}
+                </Text>
+              </View>
+              <View style={{padding: 5,paddingLeft: 10,flexDirection: 'row'}}
+              >
+                <Image style={{padding: 5,paddingLeft: 10}}
+                  source= {require("../../../assets/fighting-game.png")}
+                />
+                <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10}}
+                >
+                :{damage}
+                </Text>
+              </View>
+              <View style={{padding: 5,paddingLeft: 10,flexDirection: 'row'}}
+              >
+                <Image style={{padding: 5,paddingLeft: 10}}
+                  source= {require("../../../assets/cardiogram-2.png")}/>
+                <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10}}
+                >
+                x{this.state.user.lifePoints}
+                </Text>
+              </View>
+          </View>
+          <View style ={{padding: 10}}>
+          <Image
+              source= {require("../../../assets/settings-2.png")}
+              onPress={() => navigate("Parameter", { user: this.state.user })}
+            />
+          </View>
+        </View>
+
+        
       </View>
     );
   }

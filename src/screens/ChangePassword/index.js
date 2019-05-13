@@ -21,7 +21,7 @@ export default class ChangePassword extends Component {
     }
 
     static navigationOptions = {
-        title: "Change password"
+        title: "ChangePassword"
     };
 
     componentWillMount() {

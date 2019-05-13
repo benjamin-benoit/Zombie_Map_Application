@@ -25,13 +25,14 @@ export default class Game extends Component {
         latitudeDelta: null,
         longitudeDelta: null
       },
-      user: {},
+      user: {}
+        ,
       spawns: []
     };
   }
 
   componentWillMount() {
-    this.setState({ user: this.props.navigation.getParam('user', 'defaultValue') })
+    this.setState({ user: this.props.navigation.getParam('user', 'defaultValue')})
   }
 
   componentDidMount() {
@@ -110,24 +111,25 @@ export default class Game extends Component {
     });
   };
 
-  _onSpawnPress = async (markerData, spawnId) => {
+  _onSpawnPress = async (markerData, zombie) => {
     var spawnLatLong = markerData.coordinate;
     var distance = geolib.getDistance(
       spawnLatLong,
       { latitude: this.state.userLocation.latitude, longitude: this.state.userLocation.longitude }
     );
-    if (distance < 100) {
+    if (distance < 150) {//TODO remettre disrance à 100
       Alert.alert(
         "There is a Zombie !",
-        "Do you want to kill him ?",
+        "Do you want to fight him ?",
         [
           {
             text: "Run away",
             style: 'cancel',
           },
           {
-            text: "Kill him",
-            onPress: () => this._killZombie(spawnId),
+            text: "Fight",
+            // onPress: () => this._killZombie(spawnId),
+            onPress: () => this._BattleZombie(zombie)
           }
         ],
         { cancelable: true }
@@ -137,11 +139,47 @@ export default class Game extends Component {
     }
   }
 
+
   _killZombie(spawnId) {
     this._changeScore(1)
     this._addReach(spawnId)
-    this.setState();
+    //this.setState();
   }
+
+  _BattleZombie(zombie){
+    // console.log(typeof zombie.lifePoints)
+    // console.log(typeof zombie.attackPoints)
+    let current = Object.assign({}, this.state.user);
+    console.log(current)
+    let zombieLP = this._userAttacks(current.attackPoints,zombie.lifePoints)
+    zombies[zombie.id-1].lifePoints = zombieLP
+    if(zombieLP<=0){
+      alert('You killed the zombie !')
+      //this._killZombie(zombie.id)
+      return 1;
+    }
+    let playerLP = this._zombieAttacks(current.lifePoints,zombie.attackPoints)
+    current.lifePoints = playerLP;
+    if(current.lifePoints<=0){
+      alert('You are dead.')
+    }
+    else if(zombieLP>0){
+      alert('You fought well but the zombie is still alive!')
+    }
+    this.setState({user:current})
+    console.log(this.state.user)
+  }
+
+  _userAttacks(playerATK,zombieLP){
+    console.log(Number(zombieLP) - Number(playerATK))
+    return (Number(zombieLP) - Number(playerATK))
+  }
+
+  _zombieAttacks(playerLP,zombieATK){
+    console.log(Number(playerLP) - Number(zombieATK))
+    return (Number(playerLP) - Number(zombieATK))
+  }
+  
 
   setUserLocation(coordinate) {
     this.setState({
@@ -154,6 +192,41 @@ export default class Game extends Component {
     })
 
     // this._getZombiesSpawns()
+  }
+
+
+  _onTake = async (markerData, gun) => {
+    var spawnLatLong = markerData.coordinate;
+    var distance = geolib.getDistance(
+      spawnLatLong,
+      { latitude: this.state.userLocation.latitude, longitude: this.state.userLocation.longitude }
+    );
+    if (distance < 150) {//TODO remettre disrance à 100
+      Alert.alert(
+        "There is a gun !"
+        [
+          {
+            text: "Leave it",
+            style: 'cancel',
+          },
+          {
+            text: "Take it",
+            // onPress: () => this._killZombie(spawnId),
+            onPress: () => this._AddBonus(gun)
+          }
+        ],
+        { cancelable: true }
+      );
+    } else {
+      alert("You're too far");
+    }
+  }
+
+  _AddBonus(gun){
+    let current = Object.assign({}, this.state.user);
+    current.attackPoints =+ gun.bonus
+    this.setState({user:current})
+    alert(`You took the ${gun.title}! Go shoot some zombies now.`)
   }
 
   mapStyle = require("./mapStyle.json");
@@ -172,11 +245,12 @@ export default class Game extends Component {
           <Text style={{
             backgroundColor: "#fff", padding: 5, color: "#000", fontSize: 18
           }}
-            onPress={() => navigate("Parameter", { user: this.state.user })}
+            //onPress={() => navigate("Parameter", { user: this.state.user })}
+            onPress={() => navigate("Parameter", {})}
           >Parameter</Text>
           <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10, textAlign: 'right' }}
           >
-            Score:{this.state.user.score}
+            Score:{this.state.user.score} Life:{this.state.user.lifePoints} Atk:{this.state.user.attackPoints}
           </Text>
         </View>
         <MapView
@@ -193,19 +267,84 @@ export default class Game extends Component {
           showsCompass={true}
           onUserLocationChange={locationChangedResult => this.setUserLocation(locationChangedResult.nativeEvent.coordinate)}
         >
-          {this.state.spawns.map((m, i) => (
+          {/* {this.state.spawns.map((m, i) => ( */}
+          {zombies.map((m, i) => ( 
             <MapView.Marker
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+              id={m.id}
               title={m.title}
-              description={m.description}
+              description={`
+              HP: ${m.lifePoints}
+              ATK:${m.attackPoints}`}
+              lifePoints= {m.lifePoints}
+              attackPoints = {m.attackPoints}
               key={`marker-${i}`}
               pinColor="#20794C"
               image={require("../../../assets/zombie-4.png")}
-              onPress={(e) => { this._onSpawnPress(e.nativeEvent, m.id) }}
+              onPress={(e) => { this._onSpawnPress(e.nativeEvent, m) }}
             />
           ))}
+          {/* {weapons.map((m, i) => ( 
+            <MapView.Marker
+              coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+              id={m.id}
+              title={m.title}
+              description={`Ammo: ${m.ammo}
+              Power: ${m.bonus}`}
+              bonus = {m.bonus}
+              key={`marker-${i}`}
+              pinColor="#20794C"
+              image={require("../../../assets/gun-4.png")}
+              onPress={(e) => { this._onTake(e.nativeEvent, m) }}
+            />
+          ))} */}
         </MapView>
       </View>
     );
   }
 }
+
+const zombies = [
+  {
+    id: 1,
+    latitude: 48.759395, 
+    longitude: 2.403832,
+    title:'Zombie 1',
+    description:'Zombie',
+    lifePoints: 2,
+    attackPoints :1}
+  ,
+  {
+    id: 2,
+    latitude: 48.759897,  
+    longitude: 2.402743,
+    title:'Zombie 2',
+    description:'Strong Zombie',
+    lifePoints: 3,
+    attackPoints : 2
+  }
+]
+
+const weapons = [
+  {id: 1,
+    latitude: 48.759935, 
+    longitude: 2.401252,
+    title:'Assault Rifle',
+    description:'Weapon',
+    bonus:1,
+    ammo: 10
+  },
+  {
+    id: 2,
+    latitude: 48.758931,  
+    longitude: 2.401080,
+    title:'Scar-L',
+    description:'Weapon',
+    bonus : 2,
+    ammo: 5
+  }
+]
+
+const packs = [
+
+]

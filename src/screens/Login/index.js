@@ -20,8 +20,8 @@ export default class Login extends Component {
     super(props);
 
     this.state = {
+      id: "",
       nickname: "",
-      password: "",
       isLoggingIn: false,
       message: ""
     };
@@ -46,28 +46,13 @@ export default class Login extends Component {
       console.log(json.err);
     } else {
       console.log(json.data);
-      navigate("Game", {});
-      // this.props.connect(json.data.user, json.meta.token);
+      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score });
+      navigate("Game", { user: this.state });
     }
   };
 
   _userLogin = () => {
     this.setState({ isLoggingIn: true, message: "" });
-
-    // var params = {
-    //     nickname: this.state.nickname,
-    //     password: this.state.password,
-    //     // grant_type: 'password'
-    // };
-
-    // var formBody = [];
-    // for (var property in params) {
-    //     var encodedKey = encodeURIComponent(property);
-    //     var encodedValue = encodeURIComponent(params[property]);
-    //     formBody.push(encodedKey + "=" + encodedValue);
-    // }
-    // formBody = formBody.join("&");
-
     var proceed = false;
     console.log(formBody);
     console.log(
@@ -109,10 +94,6 @@ export default class Login extends Component {
         <Content>
           <Form>
             <ScrollView style={{ padding: 20 }}>
-              {/* <Text 
-					style={{fontSize: 27}}>
-					Login
-				</Text> */}
               <Item inlineLabel>
                 <Input
                   ref={component => (this._nickname = component)}

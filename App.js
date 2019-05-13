@@ -63,6 +63,7 @@ import Login from './src/screens/Login'
 import Secured from './src/screens/Secured'
 import Game from './src/screens/Game'
 import Register from './src/screens/Register'
+import Parameter from './src/screens/Parameter'
 
 const AppNavigator = createStackNavigator({
   Login: {
@@ -76,9 +77,12 @@ const AppNavigator = createStackNavigator({
   },
   Game: {
     screen: Game,
+  },
+  Parameter: {
+    screen: Parameter,
   }
 }, {
-  initialRouteName: 'Game',
+  initialRouteName: 'Login',
 });
 
 const AppContainer = createAppContainer(AppNavigator);

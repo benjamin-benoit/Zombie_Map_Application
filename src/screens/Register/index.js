@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ScrollView, View, ActivityIndicator } from "react-native";
+import { ScrollView } from "react-native";
 import {
   Container,
   Text,
@@ -9,13 +9,14 @@ import {
   Input,
   Item
 } from "native-base";
+import Environment from "../../../Environment";
 
 export default class Register extends Component {
 
   static navigationOptions = {
     title: "Register"
   };
-  
+
   constructor(props) {
     super(props);
 
@@ -27,7 +28,8 @@ export default class Register extends Component {
     };
   }
 
-  login = async () => {
+  register = async () => {
+    console.log('ok')
     const { navigate } = this.props.navigation;
 
     const response = await fetch(Environment.CLIENT_API + "/api/user/register", {
@@ -39,7 +41,7 @@ export default class Register extends Component {
         email: this.state.email,
         nickname: this.state.nickname,
         password: this.state.password,
-        password_confimation: this.state.passwordConfirmation
+        password_confirmation: this.state.passwordConfirmation
       })
     });
 
@@ -111,7 +113,7 @@ export default class Register extends Component {
                   !this.state.password ||
                   !this.state.passwordConfirmation
                 }
-                onPress={() => navigate("Register", {})}
+                onPress={this.register}
               >
                 <Text>Register</Text>
               </Button>

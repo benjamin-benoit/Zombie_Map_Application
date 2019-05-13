@@ -143,7 +143,7 @@ export default class Game extends Component {
   _killZombie(spawnId) {
     this._changeScore(1)
     this._addReach(spawnId)
-    //this.setState();
+    //this.setState(); reload render
   }
 
   _BattleZombie(zombie){
@@ -162,8 +162,7 @@ export default class Game extends Component {
       //this._killZombie(zombie.id)
       for(var i=0; i<zombies.length; i++){
         if(zombies[i].id == zombie.id){
-            zombies.splice(i, 1);  //removes 1 element at position i 
-            break;
+            zombies.splice(i, 1);  //removes 1 element at position i
         }
       }
       for(var i=0; i<zombies.length; i++){
@@ -239,7 +238,6 @@ export default class Game extends Component {
   _AddBonus(gun){
     let current = Object.assign({}, this.state.user);
     current.weapon = gun
-    this.setState({user:current})
     alert(`You took the ${gun.title}! Go shoot some zombies now.`)
     for(var i=0; i<weapons.length; i++){
       if(weapons[i].id == gun.id){
@@ -247,6 +245,48 @@ export default class Game extends Component {
           break;
       }
     }
+    this.setState({user:current})
+  }
+
+  _onHeal = async (markerData, pack) => {
+    var spawnLatLong = markerData.coordinate;
+    var distance = geolib.getDistance(
+      spawnLatLong,
+      { latitude: this.state.userLocation.latitude, longitude: this.state.userLocation.longitude }
+    );
+    if (distance < 150) {//TODO remettre disrance à 100
+      Alert.alert(
+        'There is a health pack !',
+        'You can gain some HP with it!',
+        [
+          {
+            text: 'Leave it',
+            style: 'cancel',
+          },
+          {
+            text: 'Take it',
+            // onPress: () => this._killZombie(spawnId),
+            onPress: () => this._AddHealth(pack)
+          }
+        ],
+        { cancelable: true }
+      );
+    } else {
+      alert("You're too far");
+    }
+  }
+
+  _AddHealth(pack){
+    let current = Object.assign({}, this.state.user);
+    current.lifePoints = current.lifePoints + pack.heal
+    alert(`You took a ${pack.title}! Go back to fight now !`)
+    for(var i=0; i<packs.length; i++){
+      if(packs[i].id == pack.id){
+          packs.splice(i, 1);  //removes 1 element at position i 
+          break;
+      }
+    }
+    this.setState({user:current})
   }
 
   mapStyle = require("./mapStyle.json");
@@ -319,7 +359,7 @@ Power: ${m.bonus}`}
               onPress={(e) => { this._onTakeGun(e.nativeEvent, m) }}
             />
           ))}
-          {/* {packs.map((m, i) => ( 
+          {packs.map((m, i) => ( 
             <MapView.Marker
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
               id={m.id}
@@ -331,7 +371,7 @@ Power: ${m.bonus}`}
               image={require("../../../assets/first-aid-kit.png")}
               onPress={(e) => { this._onHeal(e.nativeEvent, m) }}
             />
-          ))} */}
+          ))}
         </MapView>
       </View>
     );
@@ -381,16 +421,16 @@ const weapons = [
 
 const packs = [
   {id: 1,
-    latitude: 48.759935, 
-    longitude: 2.401252,
+    latitude: 48.758348, 
+    longitude: 2.403035,
     title:'Tiny health pack',
     description:'Health pack',
     heal:3,
   },
   {
     id: 2,
-    latitude: 48.758931,  
-    longitude: 2.401080,
+    latitude: 48.758065,  
+    longitude: 2.403915,
     title:'Big Health pack',
     description:'Health pack',
     heal : 5,

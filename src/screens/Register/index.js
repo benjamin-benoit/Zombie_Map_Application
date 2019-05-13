@@ -50,7 +50,8 @@ export default class Register extends Component {
       console.log(json.err);
     } else {
       console.log(json.data);
-      navigate("Game", {});
+      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score });
+      navigate("Game", { user: this.state });
       // this.props.connect(json.data.user, json.meta.token);
     }
   };
@@ -77,6 +78,7 @@ export default class Register extends Component {
                   placeholder="Nickname"
                   onChangeText={nickname => this.setState({ nickname })}
                   autoFocus={true}
+                  autoCapitalize = 'none'
                   onFocus={this.clearNickname}
                 />
               </Item>

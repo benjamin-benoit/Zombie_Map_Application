@@ -30,6 +30,14 @@ export default class Game extends Component {
     };
   }
 
+  componentWillMount() {
+    this.setState({ user: this.props.navigation.getParam('user', 'defaultValue') })
+  }
+
+  componentDidMount() {
+    this._getLocationAsync();
+    const SPAWNS = this._getZombiesSpawns();
+  }
 
   _changeScore = async (score) => {
     const response = await fetch(Environment.CLIENT_API + "/api/user/addScore", {
@@ -48,8 +56,6 @@ export default class Game extends Component {
   }
 
   _addReach = async (spawnId) => {
-    console.log(spawnId)
-    console.log(this.state.user.id)
     const response = await fetch(Environment.CLIENT_API + "/api/reach/create", {
       headers: {
         "Content-Type": "application/json"
@@ -73,15 +79,6 @@ export default class Game extends Component {
     const json = await response.json();
     this.setState({ spawns: json.data.spawns });
   };
-
-  componentWillMount() {
-    this.setState({ user: this.props.navigation.getParam('user', 'defaultValue') })
-  }
-
-  componentDidMount() {
-    this._getLocationAsync();
-    const SPAWNS = this._getZombiesSpawns();
-  }
 
   _handleMapRegionChange = region => {
     this.setState({ region });
@@ -156,14 +153,14 @@ export default class Game extends Component {
       }
     })
 
-    this._getZombiesSpawns()
+    // this._getZombiesSpawns()
   }
 
   mapStyle = require("./mapStyle.json");
 
   render() {
     const { navigate } = this.props.navigation;
-    this._getZombiesSpawns()
+    // this._getZombiesSpawns()
     return (
       <View style={{ flex: 1 }}>
         <StatusBar hidden />
@@ -175,7 +172,7 @@ export default class Game extends Component {
           <Text style={{
             backgroundColor: "#fff", padding: 5, color: "#000", fontSize: 18
           }}
-            onPress={() => navigate("Parameter", {})}
+            onPress={() => navigate("Parameter", { user: this.state.user })}
           >Parameter</Text>
           <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10, textAlign: 'right' }}
           >

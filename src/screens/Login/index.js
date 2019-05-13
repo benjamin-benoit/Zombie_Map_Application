@@ -45,7 +45,6 @@ export default class Login extends Component {
     if (response.status === 400) {
       console.log(json.err);
     } else {
-      console.log(json.data);
       this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score });
       navigate("Game", { user: this.state });
     }
@@ -100,6 +99,7 @@ export default class Login extends Component {
                   placeholder="Nickname"
                   onChangeText={nickname => this.setState({ nickname })}
                   autoFocus={true}
+                  autoCapitalize = 'none'
                   onFocus={this.clearNickname}
                 />
               </Item>

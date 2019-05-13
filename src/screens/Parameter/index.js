@@ -3,13 +3,28 @@ import { ScrollView, View, ActivityIndicator, StatusBar } from "react-native";
 import {
     Container,
     Text,
-    Content
+    Content,
+    Form,
+    Button
 } from "native-base";
 
-export default class Login extends Component {
+export default class Parameter extends Component {
+
     static navigationOptions = {
         title: "Parameter"
     };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            user: {}
+        };
+    }
+
+    componentWillMount() {
+        console.log({ user: this.props.navigation.getParam('user', 'defaultValue') })
+        this.setState({ user: this.props.navigation.getParam('user', 'defaultValue') })
+    }
 
 
     render() {
@@ -19,7 +34,20 @@ export default class Login extends Component {
                 <StatusBar hidden={false} />
                 <Container>
                     <Content>
-                        <Text>TEST</Text>
+                        <Form>
+                            <ScrollView style={{ padding: 20 }}>
+                                <Button
+                                    bordered
+                                    block
+                                    style={{
+                                        marginTop: 10
+                                    }}
+                                    onPress={() => navigate("ChangePassword", {})}
+                                >
+                                    <Text>Change my password</Text>
+                                </Button>
+                            </ScrollView>
+                        </Form>
                     </Content>
                 </Container>
             </View>

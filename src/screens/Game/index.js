@@ -111,13 +111,28 @@ export default class Game extends Component {
     });
   };
 
+  _isAlive(){
+    if(this.state.user.lifePoints>0){
+      return true;
+    }
+    else{
+      alert(`You're dead`)
+      return false
+    }
+  }
+
   _onSpawnPress = async (markerData, zombie) => {
+    let range = 100;
+    if(this._isAlive()){
     var spawnLatLong = markerData.coordinate;
     var distance = geolib.getDistance(
       spawnLatLong,
       { latitude: this.state.userLocation.latitude, longitude: this.state.userLocation.longitude }
     );
-    if (distance < 150) {//TODO remettre disrance à 100
+    if(this.state.user.weapon != null){
+     range = this.state.user.weapon.range
+    }
+    if (distance < range) {//TODO remettre disrance à 100
       Alert.alert(
         'There is a Zombie !',
         'Do you want to fight him ?',
@@ -138,6 +153,7 @@ export default class Game extends Component {
       alert("You're too far");
     }
   }
+  }
 
 
   _killZombie(spawnId) {
@@ -150,7 +166,6 @@ export default class Game extends Component {
     let bonus = (this.state.user.weapon.bonus) ? this.state.user.weapon.bonus : 0
     let damage = parseInt(this.state.user.attackPoints) + parseInt(bonus)
     let current = Object.assign({}, this.state.user);
-    console.log(current)
     let zombieLP = this._userAttacks(damage, zombie.lifePoints)
     for (var i = 0; i < zombies.length; i++) {
       if (zombies[i].id == zombie.id) {
@@ -168,11 +183,13 @@ export default class Game extends Component {
       for (var i = 0; i < zombies.length; i++) {
         console.log(zombies[i])
       }
+      this._changeScore(1)
       return 1;
     }
     let playerLP = this._zombieAttacks(current.lifePoints, zombie.attackPoints)
-    current.lifePoints = playerLP;
-    if (current.lifePoints <= 0) {
+    this._setUserHealth(current.id,playerLP)
+   // current.lifePoints = playerLP;
+    if (playerLP <= 0) {
       alert('You are dead.')
     }
     else if (zombieLP > 0) {
@@ -181,6 +198,28 @@ export default class Game extends Component {
     this.setState({ user: current })
     console.log(this.state.user)
   }
+
+  _setUserHealth = async (id,lifePoints)=>{
+    const { navigate } = this.props.navigation;
+
+    const response = await fetch(Environment.CLIENT_API + "/api/user/changeLifePoints", {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "PUT",
+      body: JSON.stringify({
+        id,
+        lifePoints
+      })
+    });
+
+    const json = await response.json();
+    if (response.status === 400) {
+      this.setState({ message: json.err });
+    } else {
+      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score, lifePoints: json.data.user.lifePoints, attackPoints: json.data.user.attackPoints, weapon: this.state.user.weapon });
+    }
+  };
 
   _userAttacks(playerATK, zombieLP) {
     console.log(Number(zombieLP) - Number(playerATK))
@@ -208,12 +247,13 @@ export default class Game extends Component {
 
 
   _onTakeGun = async (markerData, gun) => {
+    if(this._isAlive()){
     var spawnLatLong = markerData.coordinate;
     var distance = geolib.getDistance(
       spawnLatLong,
       { latitude: this.state.userLocation.latitude, longitude: this.state.userLocation.longitude }
     );
-    if (distance < 150) {//TODO remettre disrance à 100
+    if (distance < 200) {//TODO remettre disrance à 100
       Alert.alert(
         'There is a gun !',
         'It looks powerful !',
@@ -233,6 +273,7 @@ export default class Game extends Component {
     } else {
       alert("You're too far");
     }
+  }
   }
 
   _AddBonus(gun) {
@@ -339,6 +380,7 @@ ATK:${m.attackPoints}`}
               description={`Ammo: ${m.ammo}
 Power: ${m.bonus}`}
               bonus={m.bonus}
+              range={m.range}
               key={`marker-${i}`}
               pinColor="#20794C"
               image={require("../../../assets/gun-4.png")}
@@ -379,14 +421,12 @@ Power: ${m.bonus}`}
                 Score: {this.state.user.score}
               </Text>
             </View>
-            <View style={{ padding: 5, paddingLeft: 10, flexDirection: 'row' }}
+            <View style={{ flexDirection: 'row' }}
             >
-              <Image style={{ padding: 5, paddingLeft: 10 }}
-                source={require("../../../assets/fighting-game.png")}
-              />
-              <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10 }}
+              
+              <Text style={{padding: 10, color: "#fff", fontSize: 18, paddingLeft: 10 }}
               >
-                :{damage}
+                Atk :{damage}
               </Text>
             </View>
             <View style={{ padding: 5, paddingLeft: 10, flexDirection: 'row' }}
@@ -415,61 +455,63 @@ Power: ${m.bonus}`}
 const zombies = [
   {
     id: 1,
-    latitude: 48.759395,
-    longitude: 2.403832,
+    latitude: 48.789960,
+    longitude: 2.363237,
     title: 'Zombie 1',
     description: 'Zombie',
-    lifePoints: 2,
-    attackPoints: 1
+    lifePoints: 50,
+    attackPoints: 15
   }
   ,
   {
     id: 2,
-    latitude: 48.759897,
-    longitude: 2.402743,
+    latitude: 48.789840,
+    longitude: 2.362186,
     title: 'Zombie 2',
     description: 'Strong Zombie',
-    lifePoints: 3,
-    attackPoints: 2
+    lifePoints: 80,
+    attackPoints: 20
   }
 ]
 
 const weapons = [
   {
     id: 1,
-    latitude: 48.759935,
-    longitude: 2.401252,
+    latitude: 48.789225,
+    longitude: 2.362004,
     title: 'Assault Rifle',
     description: 'Weapon',
-    bonus: 1,
-    ammo: 10
+    bonus: 30,
+    //ammo: 10,
+    range:400
   },
   {
     id: 2,
     latitude: 48.758931,
-    longitude: 2.401080,
+    longitude: 2.362176,
     title: 'Scar-L',
     description: 'Weapon',
-    bonus: 2,
-    ammo: 5
+    bonus: 50,
+    //ammo: 5,
+    range:500
   }
 ]
 
 const packs = [
   {
     id: 1,
-    latitude: 48.758348,
-    longitude: 2.403035,
+    latitude: 48.788419,
+    longitude: 2.363292,
     title: 'Tiny health pack',
     description: 'Health pack',
-    heal: 3,
+    heal: 50,
   },
   {
     id: 2,
-    latitude: 48.758065,
-    longitude: 2.403915,
+    latitude: 48.788638,
+    longitude: 2.363882,
     title: 'Big Health pack',
     description: 'Health pack',
-    heal: 5,
+    heal: 100,
   }
 ]

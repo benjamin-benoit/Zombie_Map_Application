@@ -45,7 +45,7 @@ export default class Login extends Component {
     if (response.status === 400) {
       this.setState({ message: json.err });
     } else {
-      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score, lifePoints: 5, attackPoints: 1, weapon: {} });
+      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score, lifePoints: json.data.user.lifePoints, attackPoints: json.data.user.attackPoints, weapon: {} });
       navigate("Game", { user: this.state });
     }
   };

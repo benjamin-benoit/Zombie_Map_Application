@@ -24,7 +24,8 @@ export default class Register extends Component {
       email: "",
       nickname: "",
       password: "",
-      passwordConfirmation: ""
+      passwordConfirmation: "",
+      message: ""
     };
   }
 
@@ -46,10 +47,10 @@ export default class Register extends Component {
 
     const json = await response.json();
     if (response.status === 400) {
-      console.log(json.err);
+      this.setState({ message: json.err });
     } else {
       console.log(json.data);
-      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score });
+      this.setState({ id: json.data.user.id, isLoggingIn: true,score: json.data.user.score, lifePoints: json.data.user.lifePoints, attackPoints: json.data.user.attackPoints, weapon: {}  });
       navigate("Game", { user: this.state });
       // this.props.connect(json.data.user, json.meta.token);
     }
@@ -102,6 +103,11 @@ export default class Register extends Component {
                   onSubmitEditing={this._userLogin}
                 />
               </Item>
+              {!!this.state.message && (
+                <Text style={{ fontSize: 14, color: "red", padding: 5 }}>
+                  {this.state.message}
+                </Text>
+              )}
               <Button
                 block
                 style={{

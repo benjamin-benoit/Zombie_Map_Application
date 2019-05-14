@@ -29,7 +29,6 @@ export default class Register extends Component {
   }
 
   register = async () => {
-    console.log('ok')
     const { navigate } = this.props.navigation;
 
     const response = await fetch(Environment.CLIENT_API + "/api/user/register", {
@@ -65,7 +64,7 @@ export default class Register extends Component {
             <ScrollView style={{ padding: 20 }}>
               <Item inlineLabel>
                 <Input
-                  ref={component => (this.email = component)}
+                  ref={component => (this._email = component)}
                   placeholder="Email"
                   onChangeText={email => this.setState({ email })}
                   autoFocus={true}
@@ -77,7 +76,6 @@ export default class Register extends Component {
                   ref={component => (this._nickname = component)}
                   placeholder="Nickname"
                   onChangeText={nickname => this.setState({ nickname })}
-                  autoFocus={true}
                   autoCapitalize = 'none'
                   onFocus={this.clearNickname}
                 />

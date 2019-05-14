@@ -42,7 +42,7 @@ export default class Parameter extends Component {
                                     style={{
                                         marginTop: 10
                                     }}
-                                    onPress={() => navigate("ChangePassword", {})}
+                                    onPress={() => navigate("ChangePassword", { user: this.state.user })}
                                 >
                                     <Text>Change my password</Text>
                                 </Button>

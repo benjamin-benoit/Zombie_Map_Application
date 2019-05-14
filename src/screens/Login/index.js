@@ -43,47 +43,11 @@ export default class Login extends Component {
 
     const json = await response.json();
     if (response.status === 400) {
-      console.log(json.err);
+      this.setState({ message: json.err });
     } else {
-      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score , lifePoints:5,attackPoints:1, weapon:{}});
+      this.setState({ id: json.data.user.id, isLoggingIn: true, score: json.data.user.score, lifePoints: 5, attackPoints: 1, weapon: {} });
       navigate("Game", { user: this.state });
     }
-  };
-
-  _userLogin = () => {
-    this.setState({ isLoggingIn: true, message: "" });
-    var proceed = false;
-    console.log(formBody);
-    console.log(
-      JSON.stringify({
-        nickname: this.state.nickname,
-        password: this.state.password
-      })
-    );
-    fetch(Environment.CLIENT_API + "/api/user/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        nickname: this.state.nickname,
-        password: this.state.password
-      })
-    })
-      .then(response => response.json())
-      .then(response => {
-        if (response.status == 201) proceed = true;
-        else this.setState({ message: response.data });
-        console.log(response.data);
-      })
-      .then(() => {
-        this.setState({ isLoggingIn: false });
-        if (proceed) this.props.onLoginPress();
-      })
-      .catch(err => {
-        this.setState({ message: err.message });
-        this.setState({ isLoggingIn: false });
-      });
   };
 
   render() {
@@ -99,7 +63,7 @@ export default class Login extends Component {
                   placeholder="Nickname"
                   onChangeText={nickname => this.setState({ nickname })}
                   autoFocus={true}
-                  autoCapitalize = 'none'
+                  autoCapitalize='none'
                   onFocus={this.clearNickname}
                 />
               </Item>

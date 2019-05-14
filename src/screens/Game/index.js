@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, StatusBar, Alert, Image } from "react-native";
+import { Text, View, StatusBar, Alert, TouchableOpacity, Image } from "react-native";
 import { MapView, Location, Permissions } from "expo";
 import geolib from 'geolib';
 import Environment from "../../../Environment";
@@ -26,13 +26,13 @@ export default class Game extends Component {
         longitudeDelta: null
       },
       user: {}
-        ,
+      ,
       spawns: []
     };
   }
 
   componentWillMount() {
-    this.setState({ user: this.props.navigation.getParam('user', 'defaultValue')})
+    this.setState({ user: this.props.navigation.getParam('user', 'defaultValue') })
   }
 
   componentDidMount() {
@@ -146,52 +146,52 @@ export default class Game extends Component {
     //this.setState(); reload render
   }
 
-  _BattleZombie(zombie){
+  _BattleZombie(zombie) {
     let bonus = (this.state.user.weapon.bonus) ? this.state.user.weapon.bonus : 0
-    let damage = parseInt(this.state.user.attackPoints)+parseInt(bonus)
+    let damage = parseInt(this.state.user.attackPoints) + parseInt(bonus)
     let current = Object.assign({}, this.state.user);
     console.log(current)
-    let zombieLP = this._userAttacks(damage,zombie.lifePoints)
-    for(var i=0; i<zombies.length; i++){
-      if(zombies[i].id == zombie.id){
-          zombies[i].lifePoints = zombieLP
+    let zombieLP = this._userAttacks(damage, zombie.lifePoints)
+    for (var i = 0; i < zombies.length; i++) {
+      if (zombies[i].id == zombie.id) {
+        zombies[i].lifePoints = zombieLP
       }
     }
-    if(zombieLP<=0){
+    if (zombieLP <= 0) {
       alert('You killed the zombie !')
       //this._killZombie(zombie.id)
-      for(var i=0; i<zombies.length; i++){
-        if(zombies[i].id == zombie.id){
-            zombies.splice(i, 1);  //removes 1 element at position i
+      for (var i = 0; i < zombies.length; i++) {
+        if (zombies[i].id == zombie.id) {
+          zombies.splice(i, 1);  //removes 1 element at position i
         }
       }
-      for(var i=0; i<zombies.length; i++){
+      for (var i = 0; i < zombies.length; i++) {
         console.log(zombies[i])
       }
-        return 1;
+      return 1;
     }
-    let playerLP = this._zombieAttacks(current.lifePoints,zombie.attackPoints)
+    let playerLP = this._zombieAttacks(current.lifePoints, zombie.attackPoints)
     current.lifePoints = playerLP;
-    if(current.lifePoints<=0){
+    if (current.lifePoints <= 0) {
       alert('You are dead.')
     }
-    else if(zombieLP>0){
+    else if (zombieLP > 0) {
       alert('You fought well but the zombie is still alive!')
     }
-    this.setState({user:current})
+    this.setState({ user: current })
     console.log(this.state.user)
   }
 
-  _userAttacks(playerATK,zombieLP){
+  _userAttacks(playerATK, zombieLP) {
     console.log(Number(zombieLP) - Number(playerATK))
     return (Number(zombieLP) - Number(playerATK))
   }
 
-  _zombieAttacks(playerLP,zombieATK){
+  _zombieAttacks(playerLP, zombieATK) {
     console.log(Number(playerLP) - Number(zombieATK))
     return (Number(playerLP) - Number(zombieATK))
   }
-  
+
 
   setUserLocation(coordinate) {
     this.setState({
@@ -235,17 +235,17 @@ export default class Game extends Component {
     }
   }
 
-  _AddBonus(gun){
+  _AddBonus(gun) {
     let current = Object.assign({}, this.state.user);
     current.weapon = gun
     alert(`You took the ${gun.title}! Go shoot some zombies now.`)
-    for(var i=0; i<weapons.length; i++){
-      if(weapons[i].id == gun.id){
-          weapons.splice(i, 1);  //removes 1 element at position i 
-          break;
+    for (var i = 0; i < weapons.length; i++) {
+      if (weapons[i].id == gun.id) {
+        weapons.splice(i, 1);  //removes 1 element at position i 
+        break;
       }
     }
-    this.setState({user:current})
+    this.setState({ user: current })
   }
 
   _onHeal = async (markerData, pack) => {
@@ -276,17 +276,17 @@ export default class Game extends Component {
     }
   }
 
-  _AddHealth(pack){
+  _AddHealth(pack) {
     let current = Object.assign({}, this.state.user);
     current.lifePoints = current.lifePoints + pack.heal
     alert(`You took a ${pack.title}! Go back to fight now !`)
-    for(var i=0; i<packs.length; i++){
-      if(packs[i].id == pack.id){
-          packs.splice(i, 1);  //removes 1 element at position i 
-          break;
+    for (var i = 0; i < packs.length; i++) {
+      if (packs[i].id == pack.id) {
+        packs.splice(i, 1);  //removes 1 element at position i 
+        break;
       }
     }
-    this.setState({user:current})
+    this.setState({ user: current })
   }
 
   mapStyle = require("./mapStyle.json");
@@ -294,7 +294,7 @@ export default class Game extends Component {
   render() {
     const { navigate } = this.props.navigation;
     let bonus = (this.state.user.weapon.bonus) ? this.state.user.weapon.bonus : 0
-    let damage = parseInt(this.state.user.attackPoints)+parseInt(bonus)
+    let damage = parseInt(this.state.user.attackPoints) + parseInt(bonus)
     //(this.state.user.weapon) ? this.setState({})
     return (
       <View style={{ flex: 1 }}>
@@ -316,42 +316,42 @@ export default class Game extends Component {
           onUserLocationChange={locationChangedResult => this.setUserLocation(locationChangedResult.nativeEvent.coordinate)}
         >
           {/* {this.state.spawns.map((m, i) => ( */}
-          {zombies.map((m, i) => ( 
+          {zombies.map((m, i) => (
             <MapView.Marker
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
               id={m.id}
               title={m.title}
               description={`HP: ${m.lifePoints} 
 ATK:${m.attackPoints}`}
-              lifePoints= {m.lifePoints}
-              attackPoints = {m.attackPoints}
+              lifePoints={m.lifePoints}
+              attackPoints={m.attackPoints}
               key={`marker-${i}`}
               pinColor="#20794C"
               image={require("../../../assets/zombie-4.png")}
               onPress={(e) => { this._onSpawnPress(e.nativeEvent, m) }}
             />
           ))}
-          {weapons.map((m, i) => ( 
+          {weapons.map((m, i) => (
             <MapView.Marker
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
               id={m.id}
               title={m.title}
               description={`Ammo: ${m.ammo}
 Power: ${m.bonus}`}
-              bonus = {m.bonus}
+              bonus={m.bonus}
               key={`marker-${i}`}
               pinColor="#20794C"
               image={require("../../../assets/gun-4.png")}
               onPress={(e) => { this._onTakeGun(e.nativeEvent, m) }}
             />
           ))}
-          {packs.map((m, i) => ( 
+          {packs.map((m, i) => (
             <MapView.Marker
               coordinate={{ latitude: m.latitude, longitude: m.longitude }}
               id={m.id}
               title={m.title}
               description={`Heal: ${m.heal}`}
-              heal = {m.heal}
+              heal={m.heal}
               key={`marker-${i}`}
               pinColor="#20794C"
               image={require("../../../assets/first-aid-kit.png")}
@@ -362,52 +362,51 @@ Power: ${m.bonus}`}
 
         <View style={{
           flexDirection: 'row',
-          justifyContent:'space-between', 
+          justifyContent: 'space-between',
           height: 30,
-          left:0,
-          right:0,
-          top:0,
-          position:'absolute'
+          left: 0,
+          right: 0,
+          top: 0,
+          position: 'absolute'
         }}>
           <View style={{
             flex: 1,
             flexDirection: 'column'
-          }}> 
-              <View>
-                <Text style={{ padding: 10, color: "#fff", fontSize: 18, paddingLeft: 10}}
-                >
+          }}>
+            <View>
+              <Text style={{ padding: 10, color: "#fff", fontSize: 18, paddingLeft: 10 }}
+              >
                 Score: {this.state.user.score}
-                </Text>
-              </View>
-              <View style={{padding: 5,paddingLeft: 10,flexDirection: 'row'}}
+              </Text>
+            </View>
+            <View style={{ padding: 5, paddingLeft: 10, flexDirection: 'row' }}
+            >
+              <Image style={{ padding: 5, paddingLeft: 10 }}
+                source={require("../../../assets/fighting-game.png")}
+              />
+              <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10 }}
               >
-                <Image style={{padding: 5,paddingLeft: 10}}
-                  source= {require("../../../assets/fighting-game.png")}
-                />
-                <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10}}
-                >
                 :{damage}
-                </Text>
-              </View>
-              <View style={{padding: 5,paddingLeft: 10,flexDirection: 'row'}}
+              </Text>
+            </View>
+            <View style={{ padding: 5, paddingLeft: 10, flexDirection: 'row' }}
+            >
+              <Image style={{ padding: 5, paddingLeft: 10 }}
+                source={require("../../../assets/cardiogram-2.png")} />
+              <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10 }}
               >
-                <Image style={{padding: 5,paddingLeft: 10}}
-                  source= {require("../../../assets/cardiogram-2.png")}/>
-                <Text style={{ padding: 5, color: "#fff", fontSize: 18, paddingLeft: 10}}
-                >
                 x{this.state.user.lifePoints}
-                </Text>
-              </View>
+              </Text>
+            </View>
           </View>
-          <View style ={{padding: 10}}>
-          <Image
-              source= {require("../../../assets/settings-2.png")}
-              onPress={() => navigate("Parameter", { user: this.state.user })}
-            />
+          <View style={{ padding: 10 }}>
+            <TouchableOpacity activeOpacity = { .5 } onPress={() => navigate("Parameter", { user: this.state.user })}>
+              <Image
+                source={require("../../../assets/settings-2.png")}
+              />
+            </TouchableOpacity>
           </View>
         </View>
-
-        
       </View>
     );
   }
@@ -416,58 +415,61 @@ Power: ${m.bonus}`}
 const zombies = [
   {
     id: 1,
-    latitude: 48.759395, 
+    latitude: 48.759395,
     longitude: 2.403832,
-    title:'Zombie 1',
-    description:'Zombie',
+    title: 'Zombie 1',
+    description: 'Zombie',
     lifePoints: 2,
-    attackPoints :1}
+    attackPoints: 1
+  }
   ,
   {
     id: 2,
-    latitude: 48.759897,  
+    latitude: 48.759897,
     longitude: 2.402743,
-    title:'Zombie 2',
-    description:'Strong Zombie',
+    title: 'Zombie 2',
+    description: 'Strong Zombie',
     lifePoints: 3,
-    attackPoints : 2
+    attackPoints: 2
   }
 ]
 
 const weapons = [
-  {id: 1,
-    latitude: 48.759935, 
+  {
+    id: 1,
+    latitude: 48.759935,
     longitude: 2.401252,
-    title:'Assault Rifle',
-    description:'Weapon',
-    bonus:1,
+    title: 'Assault Rifle',
+    description: 'Weapon',
+    bonus: 1,
     ammo: 10
   },
   {
     id: 2,
-    latitude: 48.758931,  
+    latitude: 48.758931,
     longitude: 2.401080,
-    title:'Scar-L',
-    description:'Weapon',
-    bonus : 2,
+    title: 'Scar-L',
+    description: 'Weapon',
+    bonus: 2,
     ammo: 5
   }
 ]
 
 const packs = [
-  {id: 1,
-    latitude: 48.758348, 
+  {
+    id: 1,
+    latitude: 48.758348,
     longitude: 2.403035,
-    title:'Tiny health pack',
-    description:'Health pack',
-    heal:3,
+    title: 'Tiny health pack',
+    description: 'Health pack',
+    heal: 3,
   },
   {
     id: 2,
-    latitude: 48.758065,  
+    latitude: 48.758065,
     longitude: 2.403915,
-    title:'Big Health pack',
-    description:'Health pack',
-    heal : 5,
+    title: 'Big Health pack',
+    description: 'Health pack',
+    heal: 5,
   }
 ]

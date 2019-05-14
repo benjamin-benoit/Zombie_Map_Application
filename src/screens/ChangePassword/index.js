@@ -16,29 +16,21 @@ export default class ChangePassword extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            newPassword: "",
+            newPassword_confirmation: "",
             user: {}
         };
     }
 
     static navigationOptions = {
-        title: "ChangePassword"
+        title: "Change Password"
     };
 
     componentWillMount() {
-        console.log({ user: this.props.navigation.getParam('user', 'defaultValue') })
         this.setState({ user: this.props.navigation.getParam('user', 'defaultValue') })
     }
 
     _changePassword = async () => {
-        this.setState({ isLoggingIn: true, message: "" });
-        var proceed = false;
-        console.log(formBody);
-        console.log(
-            JSON.stringify({
-                nickname: this.state.nickname,
-                password: this.state.password
-            })
-        );
         fetch(Environment.CLIENT_API + "/api/user/changePassword", {
             method: "PUT",
             headers: {
@@ -48,8 +40,8 @@ export default class ChangePassword extends Component {
                 id: this.state.user.id,
                 nickname: this.state.user.nickname,
                 password: this.state.user.password,
-                newPassword: this.state.user.newPassword,
-                newPassword_confirmation: this.state.user.newPassword_confirmation
+                newPassword: this.state.newPassword,
+                newPassword_confirmation: this.state.newPassword_confirmation
             })
         })
             .then(response => response.json())
@@ -57,10 +49,6 @@ export default class ChangePassword extends Component {
                 if (response.status == 201) proceed = true;
                 else this.setState({ message: response.data });
                 console.log(response.data);
-            })
-            .then(() => {
-                this.setState({ isLoggingIn: false });
-                if (proceed) this.props.onLoginPress();
             })
             .catch(err => {
                 this.setState({ message: err.message });
@@ -77,38 +65,30 @@ export default class ChangePassword extends Component {
                         <ScrollView style={{ padding: 20 }}>
                             <Item inlineLabel>
                                 <Input
-                                    ref={component => (this._nickname = component)}
                                     placeholder="New password"
-                                    onChangeText={nickname => this.setState({ nickname })}
+                                    onChangeText={newPassword => this.setState({ newPassword })}
                                     autoFocus={true}
-                                    onFocus={this.clearNickname}
+                                    autoCapitalize = 'none'
+                                    onFocus={this.clearNewPassword}
                                 />
                             </Item>
                             <Item inlineLabel>
                                 <Input
-                                    ref={component => (this._password = component)}
                                     placeholder="New password confirmation"
-                                    onChangeText={password => this.setState({ password })}
-                                    secureTextEntry={true}
-                                    onFocus={this.clearPassword}
+                                    onChangeText={newPassword_confirmation => this.setState({ newPassword_confirmation })}
+                                    onFocus={this.clearNewPassword_confirmation}
+                                    autoCapitalize = 'none'
                                     onSubmitEditing={this._userLogin}
                                 />
                             </Item>
-                            {!!this.state.message && (
-                                <Text style={{ fontSize: 14, color: "red", padding: 5 }}>
-                                    {this.state.message}
-                                </Text>
-                            )}
-                            {this.state.isLoggingIn && <ActivityIndicator />}
                             <View style={{ margin: 7 }} />
                             <Button
                                 block
                                 disabled={
-                                    this.state.isLoggingIn ||
-                                    !this.state.nickname ||
-                                    !this.state.password
+                                    !this.state.newPassword ||
+                                    !this.state.newPassword_confirmation
                                 }
-                                onPress={this._changePassword()}
+                                onPress={() => this._changePassword()}
                             >
                                 <Text>Update new password</Text>
                             </Button>

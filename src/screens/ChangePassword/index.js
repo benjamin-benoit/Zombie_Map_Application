@@ -18,6 +18,7 @@ export default class ChangePassword extends Component {
         this.state = {
             newPassword: "",
             newPassword_confirmation: "",
+            message: "",
             user: {}
         };
     }
@@ -31,11 +32,12 @@ export default class ChangePassword extends Component {
     }
 
     _changePassword = async () => {
-        fetch(Environment.CLIENT_API + "/api/user/changePassword", {
-            method: "PUT",
+
+        const response = await fetch(Environment.CLIENT_API + "/api/user/changePassword", {
             headers: {
                 "Content-Type": "application/json"
             },
+            method: "PUT",
             body: JSON.stringify({
                 id: this.state.user.id,
                 nickname: this.state.user.nickname,
@@ -43,17 +45,37 @@ export default class ChangePassword extends Component {
                 newPassword: this.state.newPassword,
                 newPassword_confirmation: this.state.newPassword_confirmation
             })
-        })
-            .then(response => response.json())
-            .then(response => {
-                if (response.status == 201) proceed = true;
-                else this.setState({ message: response.data });
-                console.log(response.data);
-            })
-            .catch(err => {
-                this.setState({ message: err.message });
-                this.setState({ isLoggingIn: false });
-            });
+        });
+
+        const json = await response.json();
+        if (response.status === 400) {
+            this.setState({ message: json.err });
+        } else {
+            this.setState({ message: "Pasword updated" });
+        }
+        // fetch(Environment.CLIENT_API + "/api/user/changePassword", {
+        //     method: "PUT",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         id: this.state.user.id,
+        //         nickname: this.state.user.nickname,
+        //         password: this.state.user.password,
+        //         newPassword: this.state.newPassword,
+        //         newPassword_confirmation: this.state.newPassword_confirmation
+        //     })
+        // })
+        //     .then(response => response.json())
+        //     .then(response => {
+        //         if (response.status == 201) proceed = true;
+        //         else this.setState({ message: response.data });
+        //         console.log(response.data);
+        //     })
+        //     .catch(err => {
+        //         this.setState({ message: err.message });
+        //         this.setState({ isLoggingIn: false });
+        //     });
     };
 
     render() {
@@ -68,7 +90,7 @@ export default class ChangePassword extends Component {
                                     placeholder="New password"
                                     onChangeText={newPassword => this.setState({ newPassword })}
                                     autoFocus={true}
-                                    autoCapitalize = 'none'
+                                    autoCapitalize='none'
                                     onFocus={this.clearNewPassword}
                                 />
                             </Item>
@@ -77,7 +99,7 @@ export default class ChangePassword extends Component {
                                     placeholder="New password confirmation"
                                     onChangeText={newPassword_confirmation => this.setState({ newPassword_confirmation })}
                                     onFocus={this.clearNewPassword_confirmation}
-                                    autoCapitalize = 'none'
+                                    autoCapitalize='none'
                                     onSubmitEditing={this._userLogin}
                                 />
                             </Item>
@@ -92,6 +114,11 @@ export default class ChangePassword extends Component {
                             >
                                 <Text>Update new password</Text>
                             </Button>
+                            {!!this.state.message && (
+                                <Text style={{ fontSize: 14, color: "green", padding: 5 }}>
+                                    {this.state.message}
+                                </Text>
+                            )}
                         </ScrollView>
                     </Form>
                 </Content>

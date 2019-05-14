@@ -53,7 +53,9 @@ export default class Game extends Component {
     });
 
     const json = await response.json();
-    this.setState({ user: json.data.user })
+    console.log(json.data.user)
+    json.data.user.weapon = this.state.user.weapon
+    this.setState({ user: json.data.user})//TODO
   }
 
   _addReach = async (spawnId) => {
@@ -336,6 +338,7 @@ export default class Game extends Component {
     const { navigate } = this.props.navigation;
     let bonus = (this.state.user.weapon.bonus) ? this.state.user.weapon.bonus : 0
     let damage = parseInt(this.state.user.attackPoints) + parseInt(bonus)
+    let _hasWeapon = !Object.keys(this.state.user.weapon).length
     //(this.state.user.weapon) ? this.setState({})
     return (
       <View style={{ flex: 1 }}>
@@ -421,9 +424,10 @@ Power: ${m.bonus}`}
                 Score: {this.state.user.score}
               </Text>
             </View>
-            <View style={{ flexDirection: 'row' }}
+            <View style={{  flexDirection: 'row' }}
             >
-              
+              {/* <Image style={{ padding: 5, paddingLeft: 10 }}
+                source={(_hasWeapon) ? require("../../../assets/cardiogram-2.png"):  require("../../../assets/gun-4.png")} /> */}
               <Text style={{padding: 10, color: "#fff", fontSize: 18, paddingLeft: 10 }}
               >
                 Atk :{damage}
